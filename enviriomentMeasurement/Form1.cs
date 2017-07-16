@@ -46,6 +46,7 @@ namespace enviriomentMeasurement
             getAllProjectDataFromDB();
 
             disabelAllCtrls();
+
             addClassForm.addData += new EventHandler(addClassForm_add);
 
             foreach (Control ctl in this.Controls)
@@ -57,6 +58,11 @@ namespace enviriomentMeasurement
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void radio_select(object sender, EventArgs e)
         {
             if(((RadioButton)sender).Checked)
@@ -74,7 +80,7 @@ namespace enviriomentMeasurement
 
             //}
         }
-
+        
 
         public void addClassForm_add(object sender, EventArgs e)
         {
@@ -84,7 +90,9 @@ namespace enviriomentMeasurement
             //add db and alldata
             if (name != "")
             {
+
                 id = addClass(name, curProject);
+            
             }
             //更新控件显示
             if (id != 65535)
@@ -99,6 +107,7 @@ namespace enviriomentMeasurement
          */
         private int addProject(string name)
         {
+
             try
             {
                 //添加数据库数据
@@ -120,6 +129,7 @@ namespace enviriomentMeasurement
             {
                 return -1;
             }
+
         }
         
         private void updateProject()
@@ -128,7 +138,6 @@ namespace enviriomentMeasurement
             string sql = "select * from measuring_project";
             allData.updateProject(sqleng.ExecuteDataView(sql));
         }
-
 
         /// <summary>
         /// 添加class 测量对象数据到数据库和 alldata 同时返回当前的class id
@@ -438,7 +447,6 @@ namespace enviriomentMeasurement
             //把当前的groupbox 里面的radiobutton 干掉 在上面已经干掉了
 
            
-
         }
     }
 }
