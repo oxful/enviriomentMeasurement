@@ -166,6 +166,22 @@ namespace enviriomentMeasurement
             mapProject2Class.Add(id, list);
         }
 
+        public void delClass(int id)
+        {
+            //删除classlist
+            foreach(measuring_classify data in classList)
+            {
+                if(data.id == id)
+                {
+                    classList.Remove(data);
+                }
+            }
+            
+            //TODO 删除所有数据
+
+
+        }
+
         public void updateClass(DataView view)
         {
             //TODO:classList

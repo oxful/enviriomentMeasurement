@@ -46,8 +46,35 @@ namespace enviriomentMeasurement
             getAllProjectDataFromDB();
 
             disabelAllCtrls();
-            addClassForm.addData += new EventHandler(addClassForm_add); ;
+            addClassForm.addData += new EventHandler(addClassForm_add);
+
+            foreach (Control ctl in this.Controls)
+            {
+                if ((ctl as RadioButton) != null)
+                {
+                    ((RadioButton)ctl).CheckedChanged += new System.EventHandler(radio_select);
+                }
+            }
         }
+
+        public void radio_select(object sender, EventArgs e)
+        {
+            if(((RadioButton)sender).Checked)
+            {
+                //把之前选中的radio的  子项的所有信息都关闭
+
+
+                //显示新选中的 关联的子项信息
+                //从alldata 里面把子项数据找出来
+                //
+            }
+            //else
+            //{
+            //    //把他子项的所有信息都关闭
+
+            //}
+        }
+
 
         public void addClassForm_add(object sender, EventArgs e)
         {
@@ -57,7 +84,7 @@ namespace enviriomentMeasurement
             //add db and alldata
             if (name != "")
             {
-                id = addClass(name);
+                id = addClass(name, curProject);
             }
             //更新控件显示
             if (id != 65535)
@@ -72,21 +99,27 @@ namespace enviriomentMeasurement
          */
         private int addProject(string name)
         {
-            //添加数据库数据
-            string sql = "insert into measuring_project(name) values('"+ name + "')";
-            int ret = sqleng.MysqlCommand(sql);
-            sql = "select * from measuring_project where Id in( select max(Id) from measuring_project)";
-            DataView view = sqleng.ExecuteDataView(sql);
+            try
+            {
+                //添加数据库数据
+                string sql = "insert into measuring_project(name) values('" + name + "')";
+                int ret = sqleng.MysqlCommand(sql);
+                sql = "select * from measuring_project where Id in( select max(Id) from measuring_project)";
+                DataView view = sqleng.ExecuteDataView(sql);
 
+                measuring_project pro;
 
-            measuring_project pro;
+                pro.id = int.Parse(view.Table.Rows[0][0].ToString());//.Field<int>(new DataColumn("Id"));
+                pro.name = view.Table.Rows[0][1].ToString();//.Field<string>(new DataColumn("name"));
+                                                            //添加alldata 数据
+                allData.addProject(ref pro);
 
-            pro.id = int.Parse(view.Table.Rows[0][0].ToString());//.Field<int>(new DataColumn("Id"));
-            pro.name = view.Table.Rows[0][1].ToString();//.Field<string>(new DataColumn("name"));
-            //添加alldata 数据
-            allData.addProject(ref pro);
-
-            return pro.id;
+                return pro.id;
+            }
+            catch(Exception ex)
+            {
+                return -1;
+            }
         }
         
         private void updateProject()
@@ -96,7 +129,14 @@ namespace enviriomentMeasurement
             allData.updateProject(sqleng.ExecuteDataView(sql));
         }
 
-        private int addClass(string name)
+
+        /// <summary>
+        /// 添加class 测量对象数据到数据库和 alldata 同时返回当前的class id
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="project_id"></param>
+        /// <returns></returns>
+        private int addClass(string name, int project_id)
         {
             //TODO 构造sql 语句 添加数据库数据
             //string sql = "insert into measuring_project(name) values(" + name + ")";
@@ -185,6 +225,15 @@ namespace enviriomentMeasurement
 
             //添加数据
             curProject = addProject(projectText.Text);
+
+            if (-1 == curProject)
+            {
+                MessageBox.Show("已存在");
+                return;
+            }
+
+            //删除所有控件信息
+            disabelAllCtrls();
 
             //构造数据
             List<ID_NAME> lst = new List<ID_NAME>();
@@ -358,8 +407,37 @@ namespace enviriomentMeasurement
             updateCtrlVisable(this.groupClass, true, ref lst);
         }
 
+
+
         private void butDelItem_Click(object sender, EventArgs e)
         {
+            foreach (Control c in this.groupClass.Controls)
+            {
+                if ((c as RadioButton) != null)
+                {
+                    if (c.Visible == true && ((RadioButton)c).Checked)
+                    {
+                        allData.delClass(int.Parse(((RadioButton)c).Text.Split('_')[0]));
+
+                        List<ID_NAME> temp = new List<ID_NAME>();
+                        updateCtrlVisable(c, false, ref temp);
+                        //TODO 删除数据库classfiy 相关的所有数据
+
+                        break;
+                    }
+                    
+                }
+            }
+
+            //把剩下所有的groupbox 里面的内容干掉
+            disabelOneGroup(this.groupBox2);
+            disabelOneGroup(this.groupBox3);
+            disabelOneGroup(this.groupBox4);
+            disabelOneGroup(this.groupBox5);
+            disabelOneGroup(this.groupBox6);
+            //把当前的groupbox 里面的radiobutton 干掉 在上面已经干掉了
+
+           
 
         }
     }

@@ -207,7 +207,6 @@
             this.butDelItem.TabIndex = 1;
             this.butDelItem.Text = "删除测量对象";
             this.butDelItem.UseVisualStyleBackColor = true;
-            this.butDelItem.Click += new System.EventHandler(this.butDelItem_Click);
             // 
             // butAddItem
             // 
